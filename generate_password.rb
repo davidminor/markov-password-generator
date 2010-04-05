@@ -18,51 +18,47 @@ pen_probs = Array.new(27) { |i| Array.new(27) { |j| Array.new(27) { |k| 0 }}}
 last_probs = Array.new(27) { |i| Array.new(27) { |j| Array.new(27) { |k| 0 }}}
 
 # Count each sequence of 3 specific letters
-File.open( DICTIONARY_FILE ) { |file|
-  file.each_line { |line|
+File.open( DICTIONARY_FILE ) do |file|
+  file.each_line do |line|
     next if line.length < 5
     next if line !~ /^[a-zA-Z]+$/
     prev = [ 26, 26 ] # 26 indicates no letter
-    line.chomp.downcase.each_byte { |c|
+    prob_arr = Array.new(line.length - 2, probs) << pen_probs << last_probs
+    line.chomp.downcase.each_byte do |c|
       c -= base
-      probs[prev[-2]][prev[-1]][c] += 1
+      prob_arr.shift[prev[-2]][prev[-1]][c] += 1
       prev << c
-    }
-    # Keep track of word ending sequences
-    pen_probs[prev[-4]][prev[-3]][prev[-2]] += 1
-    last_probs[prev[-3]][prev[-2]][prev[-1]] += 1
-    probs[prev[-4]][prev[-3]][prev[-2]] -= 1
-    probs[prev[-3]][prev[-2]][prev[-1]] -= 1
-  }
-}
+    end
+  end
+end
 
 # normalize
-[ probs, pen_probs, last_probs ].each { |prob_arr|
-  prob_arr.each { |second_letter|
-    second_letter.each { |third_letter|
+[ probs, pen_probs, last_probs ].each do |prob_arr|
+  prob_arr.each do |second_letter|
+    second_letter.each do |third_letter|
       sum = third_letter.inject(0) { |s,count| s += count }
       third_letter.map! { |count| count.to_f()/sum } if sum > 0
-    }
-  }
-}
+    end
+  end
+end
 
 srand( Time.now.to_i )
-word_count.times {
+word_count.times do
 
   chars = []
-  (Array.new(word_length - 2, probs) << pen_probs << last_probs).each { |prob_arr|
+  (Array.new(word_length - 2, probs) << pen_probs << last_probs).each do |prob_arr|
     total = 0
     target = rand
-    prob_arr[chars[-2] || 26][chars[-1] || 26].each_with_index { |prob,char|
+    prob_arr[chars[-2] || 26][chars[-1] || 26].each_with_index do |prob,char|
       total += prob
       if ( total >= target )
         chars << char
         break
       end
-    }
-  }
+    end
+  end
   
   redo if ( chars.length < word_length ) #probs occasionally leads to shorter words
 
   puts chars.map { |c| (c+base).chr }.join
-}
+end
