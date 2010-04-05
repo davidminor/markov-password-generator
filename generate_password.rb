@@ -23,8 +23,8 @@ File.open( DICTIONARY_FILE ) do |file|
     next if line.length < 5
     next if line !~ /^[a-zA-Z]+$/
     prev = [ 26, 26 ] # 26 indicates no letter
-    prob_arr = Array.new(line.length - 2, probs) << pen_probs << last_probs
-    line.chomp.downcase.each_byte do |c|
+    prob_arr = [probs]*(line.chomp!.length - 2) + [pen_probs, last_probs]
+    line.downcase.each_byte do |c|
       c -= base
       prob_arr.shift[prev[-2]][prev[-1]][c] += 1
       prev << c
@@ -46,7 +46,7 @@ srand( Time.now.to_i )
 word_count.times do
 
   chars = []
-  (Array.new(word_length - 2, probs) << pen_probs << last_probs).each do |prob_arr|
+  ([probs]*(word_length-2) + [pen_probs, last_probs]).each do |prob_arr|
     total = 0
     target = rand
     prob_arr[chars[-2] || 26][chars[-1] || 26].each_with_index do |prob,char|
