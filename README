@@ -1,8 +1,8 @@
 Generates English-like words using Markov chains based on the dictionary
-you supply.
+supplied. Edit the script to define the dictionary, and optionally a file
+to store probabilities for better repeat performance.
 
 Usage:
 	ruby generate_password.rb WORD_LENGTH [NUM_TO_GENERATE]
 
-The script will calculate the probabilities from the dictionary each time
-it is run - for better performance, store the probabilities and read them in.
+Tested with 1.8.6.
