@@ -30,7 +30,7 @@ if (!PROBABILITY_FILE || !File.exist?(PROBABILITY_FILE) )
       if line !~ MATCHING_LINE then next else line = line.chomp.downcase end
       prev = [ 26, 26 ] # 26 indicates no letter
       prob_arrs = [probs]*(line.length - 2) + [pen_probs, last_probs]
-      line.each_byte { |c| prob_arr.shift[prev[-2]][prev[-1]][(prev << (c-base))[-1]] += 1 }
+      line.each_byte { |c| prob_arrs.shift[prev[-2]][prev[-1]][(prev << (c-base))[-1]] += 1 }
     end
   end
 
